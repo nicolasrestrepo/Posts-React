@@ -25383,15 +25383,15 @@
 
 	var _Home2 = _interopRequireDefault(_Home);
 
-	var _Post = __webpack_require__(223);
+	var _Post = __webpack_require__(228);
 
 	var _Post2 = _interopRequireDefault(_Post);
 
-	var _Profile = __webpack_require__(224);
+	var _Profile = __webpack_require__(230);
 
 	var _Profile2 = _interopRequireDefault(_Profile);
 
-	var _Error = __webpack_require__(225);
+	var _Error = __webpack_require__(231);
 
 	var _Error2 = _interopRequireDefault(_Error);
 
@@ -25453,9 +25453,15 @@
 
 	var _Loading2 = _interopRequireDefault(_Loading);
 
+	var _Header = __webpack_require__(223);
+
+	var _Header2 = _interopRequireDefault(_Header);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+	//components
+
 
 	class Home extends _react.Component {
 
@@ -25464,7 +25470,7 @@
 
 	    this.state = {
 	      page: 1,
-	      post: [],
+	      posts: [],
 	      loading: true
 	    };
 	    this.HandleScroll = this.HandleScroll.bind(this);
@@ -25474,11 +25480,11 @@
 	    var _this = this;
 
 	    return _asyncToGenerator(function* () {
-	      const post = yield _api2.default.post.getList(_this.state.page);
+	      const posts = yield _api2.default.post.getList(_this.state.page);
 
 	      _this.setState({
 	        page: _this.state.page + 1,
-	        post,
+	        posts,
 	        loading: false
 	      });
 	      window.addEventListener('scroll', _this.HandleScroll);
@@ -25496,15 +25502,15 @@
 
 	    const scrolled = window.scrollY;
 	    const viewportHeight = window.innerHeight;
-	    const fullHeight = document.client.height;
+	    const fullHeight = document.documentElement.clientHeight;
 
 	    if (!(scrolled + viewportHeight + 300 >= fullHeight)) {
-	      return false;
+	      console.log('null');
+	      return null;
 	    }
-	    this.setState({
-	      loading: true }, _asyncToGenerator(function* () {
+	    this.setState({ loading: true }, _asyncToGenerator(function* () {
 	      try {
-	        const posts = yield _api2.default.post.getList(_this2.state.pages);
+	        const posts = yield _api2.default.post.getList(_this2.state.page);
 
 	        _this2.setState({
 	          page: _this2.state.page + 1,
@@ -25512,28 +25518,29 @@
 	          loading: false
 
 	        });
+	        console.log(_this2.state.posts);
 	      } catch (error) {
-	        console.log(error);
+	        console.log('error', error);
 	        _this2.setState({ loading: false });
 	      }
 	    }));
 	  }
+
 	  render() {
-	    if (this.state.loading) {
-	      return _react2.default.createElement(_Loading2.default, null);
-	    }
+	    /* if(this.state.loading){
+	       return(
+	         <Loading />
+	       )
+	     }*/
 	    return _react2.default.createElement(
 	      'section',
 	      { name: 'Home' },
-	      _react2.default.createElement(
-	        'h1',
-	        null,
-	        'Home'
-	      ),
+	      _react2.default.createElement(_Header2.default, null),
 	      _react2.default.createElement(
 	        'section',
 	        null,
-	        this.state.post.map(post => _react2.default.createElement(_Post2.default, _extends({ key: post.id }, post)))
+	        this.state.loading && _react2.default.createElement(_Loading2.default, null),
+	        this.state.posts.map(post => _react2.default.createElement(_Post2.default, _extends({ key: post.id }, post)))
 	      ),
 	      _react2.default.createElement(
 	        _reactRouter.Link,
@@ -26218,6 +26225,61 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRouter = __webpack_require__(178);
+
+	var _Header = __webpack_require__(224);
+
+	var _Header2 = _interopRequireDefault(_Header);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function Header() {
+	    return _react2.default.createElement(
+	        'header',
+	        { className: [_Header2.default.header, _Header2.default.text] },
+	        _react2.default.createElement(
+	            'h1',
+	            null,
+	            'Proyecto posts'
+	        ),
+	        _react2.default.createElement(
+	            'nav',
+	            null,
+	            _react2.default.createElement(
+	                _reactRouter.Link,
+	                { to: '/' },
+	                'Home'
+	            )
+	        )
+	    );
+	}
+
+	exports.default = Header;
+
+/***/ },
+/* 224 */
+/***/ function(module, exports) {
+
+	// removed by extract-text-webpack-plugin
+	module.exports = {"header":"_3WPHw-EQIKAg90iPBJQQdD","text":"_3TYmGPGjG__LiPeSBg6reP"};
+
+/***/ },
+/* 225 */,
+/* 226 */,
+/* 227 */,
+/* 228 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 
@@ -26237,6 +26299,10 @@
 
 	var _Loading2 = _interopRequireDefault(_Loading);
 
+	var _Comment = __webpack_require__(229);
+
+	var _Comment2 = _interopRequireDefault(_Comment);
+
 	var _api = __webpack_require__(218);
 
 	var _api2 = _interopRequireDefault(_api);
@@ -26244,6 +26310,10 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+	//components
+
+	//services
+
 
 	class Post extends _react.Component {
 	  constructor(props) {
@@ -26283,7 +26353,13 @@
 	      _react2.default.createElement(_Post2.default, _extends({}, this.state.post, {
 	        user: this.state.user,
 	        comments: this.state.comments
-	      }))
+	      })),
+	      _react2.default.createElement(
+	        'h1',
+	        null,
+	        'comentarios'
+	      ),
+	      this.state.comments.map(comment => _react2.default.createElement(_Comment2.default, _extends({ key: comment.id }, comment)))
 	    );
 	  }
 	}
@@ -26291,7 +26367,43 @@
 	exports.default = Post;
 
 /***/ },
-/* 224 */
+/* 229 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function Comment(props) {
+	    return _react2.default.createElement(
+	        'article',
+	        { id: `comment-${ props.id }` },
+	        'By: ',
+	        _react2.default.createElement(
+	            'a',
+	            { href: `mailto:${ props.email }` },
+	            props.name
+	        ),
+	        _react2.default.createElement(
+	            'p',
+	            null,
+	            props.body
+	        )
+	    );
+	}
+
+	exports.default = Comment;
+
+/***/ },
+/* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -26408,7 +26520,7 @@
 	exports.default = Profile;
 
 /***/ },
-/* 225 */
+/* 231 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

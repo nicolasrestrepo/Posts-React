@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router'
-
 import api from '../../api.js'
+//components
 import Post from '../../posts/containers/Post.jsx'
 import Loading from '../../shared/components/Loading.jsx'
+import Header from '../../shared/components/Header.jsx'
 
 class Home extends Component {
 
@@ -12,18 +13,18 @@ class Home extends Component {
 
     this.state = {
       page : 1,
-      post: [],
+      posts: [],
       loading: true
     }
     this.HandleScroll = this.HandleScroll.bind(this)
   }
 
   async componentDidMount(){
-    const post = await api.post.getList(this.state.page)
+    const posts = await api.post.getList(this.state.page)
     
     this.setState({
       page: this.state.page + 1,
-      post,
+      posts,
       loading: false
     })
    window.addEventListener('scroll', this.HandleScroll)
@@ -38,15 +39,15 @@ class Home extends Component {
 
       const scrolled = window.scrollY
       const viewportHeight = window.innerHeight
-      const fullHeight = document.client.height
+      const fullHeight = document.documentElement.clientHeight
 
         if(!(scrolled + viewportHeight + 300 >= fullHeight) ){
-          return false
+          console.log('null')
+          return null
         }
-        this.setState({
-          loading: true}, async () =>{
+        this.setState({loading: true}, async () =>{
             try{
-              const posts = await api.post.getList(this.state.pages)
+              const posts = await api.post.getList(this.state.page)
 
               this.setState({
                 page: this.state.page + 1, 
@@ -54,24 +55,30 @@ class Home extends Component {
                 loading: false
 
               })
+              console.log(this.state.posts)
             }catch (error){
-              console.log(error)
+              console.log('error', error)
               this.setState({loading: false})
             }
           })
   }
+
+
   render() {
-    if(this.state.loading){
+   /* if(this.state.loading){
       return(
         <Loading />
       )
-    }
+    }*/
     return (
       
       <section name="Home">
-        <h1>Home</h1>
+       <Header />
         <section>
-           {this.state.post.map(post => <Post key={post.id} {...post}/>)}
+          {this.state.loading && (
+            <Loading />
+          )}
+           {this.state.posts.map(post => <Post key={post.id} {...post}/>)}
         </section>
         <Link to="/about">
           Go to about

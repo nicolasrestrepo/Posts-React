@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
-
+//components
 import PostBody from '../../posts/containers/Post.jsx'
 import Loading from '../../shared/components/Loading.jsx'
-
+import Comment from '../../comments/components/Comment.jsx'
+//services
 import api from '../../api.js'
 
 class Post extends Component {
@@ -47,7 +48,11 @@ class Post extends Component {
           user={this.state.user}
           comments={this.state.comments}
         />
-
+        <h1>comentarios</h1>
+        {
+          this.state.comments
+          .map(comment => (<Comment key={comment.id} {...comment}/>))
+        }
       </section>
     );
   }
