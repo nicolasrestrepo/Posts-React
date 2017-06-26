@@ -1,84 +1,74 @@
-import React, { Component } from 'react'
+import React, { Component, PropTypes } from 'react'
 import { Link } from 'react-router'
 import api from '../../api.js'
 //components
 import Post from '../../posts/containers/Post.jsx'
 import Loading from '../../shared/components/Loading.jsx'
 import Header from '../../shared/components/Header.jsx'
+//redux
+import { connect } from 'react-redux'
+import actions from '../../actions'
 
 class Home extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
-
     this.state = {
-      page : 1,
-      posts: [],
       loading: true
     }
     this.HandleScroll = this.HandleScroll.bind(this)
   }
 
-  async componentDidMount(){
-    const posts = await api.post.getList(this.state.page)
-    
-    this.setState({
-      page: this.state.page + 1,
-      posts,
-      loading: false
-    })
-   window.addEventListener('scroll', this.HandleScroll)
+  async componentDidMount() {
+    this.InitialFetch();
+    window.addEventListener('scroll', this.HandleScroll)
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     window.removeEventListener('scroll', this.HandleScroll)
   }
 
-  HandleScroll(event){
-      if(this.state.loading) return null
+  async InitialFetch(){
+      const posts = await api.post.getList(this.props.page)
+    this.props.dispatch(
+      actions.setPost(posts)
+    )
+    this.setState({ loading: false })
+  }
+  HandleScroll(event) {
+    if (this.state.loading) return null
 
-      const scrolled = window.scrollY
-      const viewportHeight = window.innerHeight
-      const fullHeight = document.documentElement.clientHeight
+    const scrolled = window.scrollY
+    const viewportHeight = window.innerHeight
+    const fullHeight = document.documentElement.clientHeight
 
-        if(!(scrolled + viewportHeight + 300 >= fullHeight) ){
-          console.log('null')
-          return null
-        }
-        this.setState({loading: true}, async () =>{
-            try{
-              const posts = await api.post.getList(this.state.page)
-
-              this.setState({
-                page: this.state.page + 1, 
-                posts: this.state.posts.concat(posts),
-                loading: false
-
-              })
-              console.log(this.state.posts)
-            }catch (error){
-              console.log('error', error)
-              this.setState({loading: false})
-            }
-          })
+    if (!(scrolled + viewportHeight + 300 >= fullHeight)) {
+      console.log('null')
+      return null
+    }
+    this.setState({ loading: true }, async () => {
+      try {
+        const posts = await api.post.getList(this.props.page)
+        this.props.dispatch(
+      actions.setPost(posts)
+    )
+        this.setState({loading: false})
+      } catch (error) {
+        console.log('error', error)
+        this.setState({ loading: false })
+      }
+    })
   }
 
-
   render() {
-   /* if(this.state.loading){
-      return(
-        <Loading />
-      )
-    }*/
     return (
-      
       <section name="Home">
-       <Header />
+        <Header />
         <section>
           {this.state.loading && (
             <Loading />
           )}
-           {this.state.posts.map(post => <Post key={post.id} {...post}/>)}
+          {this.props.posts.map(post => <Post key={post.id} {...post} />)}
         </section>
         <Link to="/about">
           Go to about
@@ -88,4 +78,23 @@ class Home extends Component {
   }
 }
 
-export default Home;
+Home.PropTypes = {
+  dispach: PropTypes.func,
+  posts: PropTypes.arrayOf(PropTypes.object),
+  page: PropTypes.number
+}
+
+function mapStateToProps(state, props) {
+  return {
+    posts: state.posts.entities,
+    page: state.posts.page
+  }
+}
+
+/*function mapDispatchToProps(dispatch, props){
+return {
+  dispatch
+}
+}*/
+
+export default connect(mapStateToProps/*, mapDispatchToProps*/)(Home);

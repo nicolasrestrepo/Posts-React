@@ -2,17 +2,21 @@ import http from 'http';
 import React from 'react';
 import { renderToString, renderToStaticMarkup } from 'react-dom/server'
 import { ServerRouter, createServerRenderContext } from 'react-router'
-
+import { Provider } from 'react-redux'
+//components
+import store from './store'
 import Pages from './pages/containers/Page.jsx'
 import Layout from './pages/components/Layout.jsx'
 
 
-function requestHandler(request, response){
+function requestHandler(request, response) {
   const context = createServerRenderContext()
   let html = renderToString(
-    <ServerRouter location={request.url} context={context}>
-      <Pages />
-    </ServerRouter>
+    <Provider store={store}>
+      <ServerRouter location={request.url} context={context}>
+        <Pages />
+      </ServerRouter>
+    </Provider>
   )
 
   const result = context.getResult();
@@ -29,9 +33,11 @@ function requestHandler(request, response){
     response.writeHead(404);
 
     html = renderToString(
-      <ServerRouter location={request.url} context={context}>
-        <Pages />
-      </ServerRouter>
+      <Provider store={store}>
+        <ServerRouter location={request.url} context={context}>
+          <Pages />
+        </ServerRouter>
+      </Provider>
     );
   }
 
