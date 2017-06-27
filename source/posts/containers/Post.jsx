@@ -1,7 +1,10 @@
 import React, { Component, PropTypes } from 'react'
-import {Link} from 'react-router'
-import api from '../../api.js'
+import { Link } from 'react-router'
 
+//redux
+import actions from '../../actions'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 class Post extends Component {
 
     constructor(props){
@@ -15,19 +18,12 @@ class Post extends Component {
     }
 
     async componentDidMount(){
-        if(!!this.state.user && !!this.state.comments) return this.setState({loading:false})
-        const [ //estamos descoponiendo un array
-            user,
-            comments,
-        ] = await Promise.all([
-            !this.state.user ? api.user.getSingle(this.props.userId) : Promise.resolve(null),
-            !this.state.comments ? api.post.getComments(this.props.id) : Promise.resolve(null)
+        if(!!this.props.user && !!this.props.comments) return this.setState({loading:false})
+         await Promise.all([
+            this.props.actions.loadUser(this.props.userId),
+            this.props.actions.loadCommentsForPost(this.props.id)
         ])
-        this.setState({
-            loading: false,
-            user: user || this.state.user,
-            comments: comments || this.state.comments
-        })
+        this.setState({loading: false })
     }
     render() {
         return (
@@ -40,11 +36,11 @@ class Post extends Component {
                 </p>
                 {!this.state.loading && 
                     <div>
-                    <Link to={`/user/${this.state.user.id}`}>
-                       {this.state.user.name}
+                    <Link to={`/user/${this.props.user.id}`}>
+                       {this.props.user.name}
                     </Link>
                     <span>
-                    Hay {this.state.comments.length} comentarios
+                    Hay {this.props.comments.length} comentarios
                     </span>
                     </div>
             }
@@ -59,7 +55,31 @@ Post.propTypes = {
     id: PropTypes.number,
     userId: PropTypes.number,
     title: PropTypes.string,
-    body: PropTypes.string
+    body: PropTypes.string,
+    user:PropTypes.shape({
+        id: PropTypes.number,
+        name: PropTypes.string
+        
+    }),
+    comments: PropTypes.arrayOf(
+        PropTypes.object
+    ),
+    actions: PropTypes.objectOf(
+        PropTypes.func
+    )
 }
 
-export default Post
+function mapStateToProps(state, props){ //se reciben los props propios del componente
+    return {
+        comments: state.comments.filter(comments => comments.postId == props.id),
+        user: state.user[props.userId]
+    }
+}
+
+function mapDispatchToProps(dispatch){
+    return {
+        actions: bindActionCreators(actions, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Post)

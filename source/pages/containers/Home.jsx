@@ -1,13 +1,14 @@
-import React, { Component, PropTypes } from 'react'
-import { Link } from 'react-router'
-import api from '../../api.js'
+import React, { Component, PropTypes } from 'react';
+import { Link } from 'react-router';
+import api from '../../api.js';
 //components
-import Post from '../../posts/containers/Post.jsx'
-import Loading from '../../shared/components/Loading.jsx'
-import Header from '../../shared/components/Header.jsx'
+import Post from '../../posts/containers/Post.jsx';
+import Loading from '../../shared/components/Loading.jsx';
+import Header from '../../shared/components/Header.jsx';
 //redux
-import { connect } from 'react-redux'
-import actions from '../../actions'
+import { connect } from 'react-redux';
+import actions from '../../actions';
+import { bindActionCreators } from 'redux';
 
 class Home extends Component {
 
@@ -28,11 +29,8 @@ class Home extends Component {
     window.removeEventListener('scroll', this.HandleScroll)
   }
 
-  async InitialFetch(){
-      const posts = await api.post.getList(this.props.page)
-    this.props.dispatch(
-      actions.setPost(posts)
-    )
+  async InitialFetch() {
+    await this.props.actions.postNextPage();
     this.setState({ loading: false })
   }
   HandleScroll(event) {
@@ -48,11 +46,8 @@ class Home extends Component {
     }
     this.setState({ loading: true }, async () => {
       try {
-        const posts = await api.post.getList(this.props.page)
-        this.props.dispatch(
-      actions.setPost(posts)
-    )
-        this.setState({loading: false})
+        await this.props.actions.postNextPage();
+        this.setState({ loading: false })
       } catch (error) {
         console.log('error', error)
         this.setState({ loading: false })
@@ -79,7 +74,7 @@ class Home extends Component {
 }
 
 Home.PropTypes = {
-  dispach: PropTypes.func,
+  actions: PropTypes.objectOf(PropTypes.func),
   posts: PropTypes.arrayOf(PropTypes.object),
   page: PropTypes.number
 }
@@ -91,10 +86,10 @@ function mapStateToProps(state, props) {
   }
 }
 
-/*function mapDispatchToProps(dispatch, props){
-return {
-  dispatch
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(actions, dispatch)
+  }
 }
-}*/
 
-export default connect(mapStateToProps/*, mapDispatchToProps*/)(Home);
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
